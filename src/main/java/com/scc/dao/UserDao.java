@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class UserDao {
 
@@ -167,6 +168,31 @@ public boolean approveUser(int userId){
             System.err.println("Error approving users: "+e.getMessage());
         }
         return false;
-}
+    }
 
-}
+    public boolean UpdateUserAndStatus (int userId, String newRoles, String newStatus ){
+
+        String sql = "UPDATE users SET roles = ?, status = ? WHERE id = ?";
+        try (
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
+
+            pstmt.setString(1, newRoles.toUpperCase());
+            pstmt.setString(2, newStatus.toUpperCase());
+            pstmt.setInt(3, userId);
+
+            int rowsUpdated = pstmt.executeUpdate();
+            if (rowsUpdated > 0){
+                System.out.println(" -> User Id:" +userId+ "updated successfully!");
+                return true;
+            }else{
+                System.out.println(" -> User Id not found.");
+            }
+            return false;
+        } catch (SQLException e){
+            System.err.println("Error udating user: " +e.getMessage());
+        }
+        return false;
+    }
+
+    }
